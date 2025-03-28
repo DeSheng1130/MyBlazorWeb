@@ -1,0 +1,13 @@
+﻿<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; @Year @Description
+    </div>
+</footer>
+
+
+@code {
+    [CascadingParameter(Name = "description")]
+    public string Description { get; set; } = "default description";
+    [CascadingParameter]
+    public int Year { get; set; } = DateTime.Now.Year;
+}

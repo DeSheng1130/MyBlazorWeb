@@ -1,0 +1,15 @@
+﻿@page "/errordemo"
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+
+@code {
+    private string PageTitle = "Error Demo";
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("OnInitialized");
+        throw new Exception("發生不明錯誤!");
+    }
+}

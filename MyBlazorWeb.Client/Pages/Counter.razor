@@ -1,0 +1,26 @@
+﻿@page "/counter"
+@* @rendermode InteractiveAuto *@
+@rendermode InteractiveWebAssembly
+@inject IConfiguration Configuration
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+<h1>@Configuration["AppName"]</h1>
+<h3 class="text-muted">Render @(OperatingSystem.IsBrowser() ? "Wasm" : "Server")</h3>
+
+<p role="status" style="@GetShowMsg()">Cureent count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private string PageTitle = "Counter";
+    private int currentCount = 0;
+
+    private void IncrementCount() {
+        // throw new Exception("IncrementCount");
+        currentCount++;
+    }
+
+    private string GetShowMsg() =>  currentCount % 2 == 0 ? "color: red" : "color: blue";
+}

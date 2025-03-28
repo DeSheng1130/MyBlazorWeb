@@ -1,0 +1,8 @@
+﻿<a href="@Href" class="btn btn-danger m-1">@BtnName</a>
+@code {
+    [Parameter]
+    public string Href { get; set; } = "/";
+
+    [Parameter]
+    public string BtnName { get; set; } = "Delete";
+}

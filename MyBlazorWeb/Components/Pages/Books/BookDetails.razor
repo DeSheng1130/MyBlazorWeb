@@ -1,0 +1,51 @@
+﻿@page "/bookdetails"
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+
+@if(Book is not null)
+{
+    <div>
+        <dl class="row">
+            <dt class="col-sm-4">Title</dt>
+            <dd class="col-sm-8">@Book.Title</dd>
+            <dt class="col-sm-4">Price</dt>
+            <dd class="col-sm-8">@Book.Price</dd>
+            <dt class="col-sm-4">PublishDate</dt>
+            <dd class="col-sm-8">@Book.PublishDate.ToShortDateString()</dd>
+            <dt class="col-sm-4">InStock</dt>
+            <dd class="col-sm-8">@Book.InStock</dd>
+            <dt class="col-sm-4">Description</dt>
+            <dd class="col-sm-8">@Book.Description</dd>
+        </dl>
+    </div>
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+<BtnPrimary href="./booklist" BtnName="Back to List"></BtnPrimary>
+
+@code {
+    private string PageTitle = "Book Details";
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+    public Book? Book { get; set; }
+
+    [Inject]
+    public IBookService BookService { get; set; } = default!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        Book = await BookService.GetBook(Id) ?? new();
+    }
+
+}

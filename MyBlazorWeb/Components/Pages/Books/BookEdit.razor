@@ -1,0 +1,76 @@
+﻿@page "/bookedit/{Id:int}"
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+
+@if (Book is not null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <EditForm Model="Book" FormName="edit" OnValidSubmit="HandleSubmit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary/>
+
+                <input type="hidden" name="Book.Id" value="@Book.Id"/>
+                <div class="md-3">
+                    <label for="Title" class="form-label">Title</label>
+                    <InputText id="Title" @bind-Value="Book.Title" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => Book.Title)"/>
+                </div>
+                <div class="md-3">
+                    <label for="Price" class="form-label">Price</label>
+                    <InputNumber id="Price" @bind-Value="Book.Price" class="form-control"></InputNumber>
+                    <ValidationMessage For="@(() => Book.Price)" />
+                </div>
+                <div class="md-3">
+                    <label for="PublishDate" class="form-label">PublishDate</label>
+                    <InputDate id="PublishDate" @bind-Value="Book.PublishDate" class="form-control"></InputDate>
+                    <ValidationMessage For="@(() => Book.PublishDate)" />
+                </div>
+                <div class="md-3 form-check">
+                    <InputCheckbox id="InStock" @bind-Value="Book.InStock" class="form-check-input" />
+                    <label for="InStock" class="form-check-label">InStock</label>
+                    <ValidationMessage For="@(() => Book.InStock)" />
+                </div>
+                <div class="md-3">
+                    <label for="Description" class="form-check-label">Description</label>
+                    <InputTextArea id="Description" @bind-Value="Book.Description" class="form-control" />
+                    <ValidationMessage For="@(() => Book.Description)" />
+                </div>
+                <div class="md-3">
+                    <input type="submit" value="Save" class="btn btn-primary"/>
+                    <BtnPrimary href="./booklist" BtnName="Back to List"></BtnPrimary>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private string PageTitle = "Book Eidt";
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Book? Book { get; set; }
+
+    [Inject]
+    public IBookService BookService { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Book ??= await BookService.GetBook(Id);
+    }
+
+    protected async Task HandleSubmit()
+    {
+        await BookService.UpdateBook(Book!);
+        NavigationManager.NavigateTo("./booklist");
+    }
+
+}

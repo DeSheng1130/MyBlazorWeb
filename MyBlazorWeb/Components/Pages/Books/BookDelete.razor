@@ -1,0 +1,64 @@
+﻿@page "/bookdelete/{Id:int}"
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+@if (Book is not null)
+{
+    <div>
+        <dl class="row">
+            <dt class="col-sm-4">Title</dt>
+            <dd class="col-sm-8">@Book.Title</dd>
+            <dt class="col-sm-4">Price</dt>
+            <dd class="col-sm-8">@Book.Price</dd>
+            <dt class="col-sm-4">PublishDate</dt>
+            <dd class="col-sm-8">@Book.PublishDate.ToShortDateString()</dd>
+            <dt class="col-sm-4">InStock</dt>
+            <dd class="col-sm-8">@Book.InStock</dd>
+            <dt class="col-sm-4">Description</dt>
+            <dd class="col-sm-8">@Book.Description</dd>
+        </dl>
+    </div>
+    <hr />
+    <EditForm Model="Book" FormName="delete" OnValidSubmit="HandleSubmit" Enhance>
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <BtnPrimary href="./booklist" BtnName="Back to List"></BtnPrimary>
+     </EditForm>
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+
+@code {
+    private string PageTitle = "Book Delete";
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Book? Book { get; set; }
+
+    [Inject]
+    public IBookService BookService { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Book ??= await BookService.GetBook(Id);
+    }
+
+    protected async Task HandleSubmit()
+    {
+        await BookService.DeleteBook(Id);
+        NavigationManager.NavigateTo("./booklist", forceLoad: true);
+    }
+
+}

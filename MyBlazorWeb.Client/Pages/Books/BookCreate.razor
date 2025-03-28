@@ -1,0 +1,95 @@
+﻿@page "/create"
+@rendermode InteractiveWebAssembly
+
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+<h3 class="text-muted">Render @(OperatingSystem.IsBrowser() ? "Wasm" : "Server")</h3>
+
+<div class="row">
+    <div class="col-md-8">
+        <EditForm Model="Book" FormName="create" OnValidSubmit="HandleSubmit" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <input type="hidden" name="Book.Id" value="@Book.Id" />
+            <div class="md-3">
+                <label for="Title" class="form-label">Title</label>
+                <InputText @ref="txtTitleReference" id="Title" @bind-Value="Book.Title" class="form-control"></InputText>
+                <ValidationMessage For="@(() => Book.Title)" />
+            </div>
+            <div class="md-3">
+                <label for="Price" class="form-label">Price</label>
+                <InputNumber id="Price" type="Range" min="0" max="500" step="10" @bind-Value="Book.Price" class="form-control"></InputNumber>
+                <p>@Book.Price</p>
+                <ValidationMessage For="@(() => Book.Price)" />
+            </div>
+            <div class="md-3">
+                <label for="PublishDate" class="form-label">PublishDate</label>
+                <InputDate id="PublishDate" @bind-Value="Book.PublishDate" class="form-control"></InputDate>
+                <ValidationMessage For="@(() => Book.PublishDate)" />
+            </div>
+            <div class="md-3 form-check">
+                <InputCheckbox id="InStock" @bind-Value="Book.InStock" class="form-check-input" />
+                <label for="InStock" class="form-check-label">InStock</label>
+                <ValidationMessage For="@(() => Book.InStock)" />
+            </div>
+            <div class="md-3">
+                <label for="Description" class="form-check-label">Description</label>
+                <InputTextArea id="Description" @bind-Value="Book.Description" class="form-control" />
+                <ValidationMessage For="@(() => Book.Description)" />
+            </div>
+            <div class="md-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                @* <BtnPrimary href="./booklist" BtnName="Back to List"></BtnPrimary> *@
+                <a href="./booklist" class="btn btn-danger m-1">Back to List</a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private string PageTitle = "Book Create";
+
+    [SupplyParameterFromForm]
+    public Book Book { get; set; } = new();
+
+    [Inject]
+    public IBookService BookService { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected async Task HandleSubmit()
+    {
+        try
+        {
+            // throw new Exception("-------------------");
+            Book = await BookService.CreateBook(Book);
+            var module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/site.js");
+            await module.InvokeVoidAsync("saveMessage", Book.Id, Book.Title);
+            NavigationManager.NavigateTo("./booklist");
+        }
+        catch (Exception)
+        {            
+            var module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/site.js");
+            await module.InvokeVoidAsync("errorMessage");
+        }
+
+    }
+
+    InputText txtTitleReference = null!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender && txtTitleReference.Element is not null)
+        {
+            await txtTitleReference.Element.Value.FocusAsync();
+        }
+    }
+
+
+}

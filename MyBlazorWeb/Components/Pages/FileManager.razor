@@ -1,0 +1,53 @@
+﻿@page "/fileManager"
+@inject IWebHostEnvironment environment
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+
+<form method="post"enctype="multipart/form-data" @formname="UploadFileForm" @onsubmit="UploadFile">
+    <AntiforgeryToken/>
+    <input type="file" name="myfile" class="form-control" />
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+<div class="text-danger mt-4">
+    @msg
+</div>
+
+@code {
+    public string PageTitle { get; set; } = "File Upload";
+
+    [SupplyParameterFromForm(FormName = "UploadFileForm")]
+    IFormFile? MyFile { get; set; }
+
+    string msg = "";
+
+    async Task UploadFile()
+    {
+        try
+        {
+            if(MyFile is null)
+            {
+                throw new Exception("File not Found!!");
+            }
+
+            var folder = Path.Combine(environment.WebRootPath, @"images");
+            var path = Path.Combine(folder, MyFile.FileName);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            await using var stream = new FileStream(path, FileMode.Create);
+            await MyFile.CopyToAsync(stream);
+
+            msg = "File Uploaded Sucessfully";
+        }
+        catch (Exception ex)
+        {
+            msg = $"Error: {ex.Message}";
+        }
+       
+    }
+
+}

@@ -1,0 +1,40 @@
+﻿@if (Book is not null)
+{
+    <tr>
+        <td>
+            <input type="checkbox" checked="@IsSelected" @onchange="SelecChanged" />
+            @Book.Id
+        </td>
+        <td>@Book.Title</td>
+        @if (ShowAll)
+        {
+            <td>@Book.Price</td>
+            <td>@Book.PublishDate.ToLongDateString()</td>
+            <td>@Book.InStock</td>
+            <td>@Book.Description</td>
+        }
+        <td>
+            <BtnPrimary Href="@($"bookdetails?id={Book.Id}")" BtnName="Details"></BtnPrimary>
+            <BtnPrimary Href="@($"bookedit/{Book.Id}")" BtnName="Edit"></BtnPrimary>
+            <BtnDanger Href="@($"bookdelete/{Book.Id}")"></BtnDanger>
+        </td>
+    </tr>
+}
+
+@code {
+    [Parameter]
+    public Book? Book { get; set; }
+    [Parameter]
+    public bool ShowAll { get; set; } = true;
+    [Parameter]
+    public EventCallback<bool> OnSelected { get; set; }
+
+    protected bool IsSelected { get; set; } = false;
+
+    protected Task SelecChanged(ChangeEventArgs e)
+    {
+        IsSelected = e.Value is bool value && value;
+        return OnSelected.InvokeAsync(IsSelected);
+    }
+
+}

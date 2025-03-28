@@ -1,0 +1,93 @@
+﻿@page "/booklist"
+@* @attribute [StreamRendering] *@
+@* @rendermode InteractiveServer *@
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject ILogger<BookList> logger
+
+<PageTitle>@PageTitle</PageTitle>
+
+<h1>@PageTitle</h1>
+
+<div>
+    <input type="checkbox" id="showAllData" @bind="ShowAllColumn" />
+    <label for="showAllData"> Show All Column </label>
+</div>
+
+<div>
+    Count : @SelectedCount
+</div>
+
+@if (Books is null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                @if (ShowAllColumn)
+                {
+                    <th>Price</th>
+                    <th>PublishDate</th>
+                    <th>InStock</th>
+                    <th>Description</th>
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Books)
+            {
+                <ShowBook Book="item" ShowAll="ShowAllColumn" OnSelected="SelectionChanged"></ShowBook>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+@code {
+    private string PageTitle = "Books List";
+    public bool ShowAllColumn { get; set; } = true;
+
+    public IEnumerable<Book> Books { get; set; } = null!;
+
+    // protected override void OnInitialized()
+    // {
+    //     logger.LogCritical(" Critical - OnInitialized");
+    //     logger.LogInformation(" Information - OnInitialized");
+    //     logger.LogTrace(" Trace  - OnInitialized");
+    // }
+
+
+
+    [Inject]
+    public MyServices.IBookService bookService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        Books = await bookService.GetAllBooks();
+    }
+
+    private async Task Query()
+    {
+        Books = null!;
+        await Task.Delay(5000);
+        Books = await bookService.GetAllBooks();
+    }
+
+    protected int SelectedCount { get; set; } = 0;
+
+    protected void SelectionChanged(bool isSelected)
+    {
+        SelectedCount += isSelected ? 1 : -1;
+    }
+}

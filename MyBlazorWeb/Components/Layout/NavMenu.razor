@@ -1,0 +1,51 @@
+﻿@using MyModels.DTO
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">@NavbarBrand</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                @*                 <li class="nav-item">
+                     <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Home</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="booklist">Books</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="create">Create</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="counter">Counter</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="privacy">Privacy</NavLink>
+                </li> *@
+
+                @foreach (var item in UrlDTOs)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="@item.Url" Match="NavLinkMatch.All">@item.Name</NavLink>
+                    </li>
+                }
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+@code {
+    private string NavbarBrand = "XCOM";
+
+    private List<UrlDTO> UrlDTOs = [
+        new(){Url= "", Name= "Home" },
+        new(){Url= "booklist", Name= "Books" },
+        new(){Url= "create", Name= "Create" },
+        new(){Url= "counter", Name= "Counter" },
+        new(){Url= "privacy", Name= "Privacy" },
+        new(){Url= "filemanager", Name= "File Manager" },
+        new(){Url= "errordemo", Name= "Error" }
+     ];
+}

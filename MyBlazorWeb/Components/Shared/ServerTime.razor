@@ -1,0 +1,10 @@
+﻿<div class="alert alert-secondary mt-4">
+    <strong>@ShowDate.ToString(DateTimeFormat)</strong>
+</div>
+
+@code {
+    [Parameter]
+    public string DateTimeFormat { get; set; } = "yyyy-MM-dd";
+    [Parameter]
+    public DateTime ShowDate { get; set; }
+}

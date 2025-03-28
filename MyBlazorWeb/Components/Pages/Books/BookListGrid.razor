@@ -1,0 +1,88 @@
+﻿@page "/booklistgrid"
+@* @attribute [StreamRendering] *@
+@* @rendermode InteractiveServer *@
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject ILogger<BookList> logger
+
+<PageTitle>@PageTitle</PageTitle>
+
+<style scoped>
+    ::deep tr {
+        height: 2em;
+    }
+
+        ::deep tr:has(> td:not(:empty)) > td {
+            display: table-cell;
+        }
+
+    ::deep td:empty {
+        display: none;
+    }
+</style>
+
+<h1>@PageTitle</h1>
+
+<div>
+    <input type="checkbox" id="showAllData" @bind="ShowAllColumn" />
+    <label for="showAllData"> Show All Column </label>
+</div>
+
+@if (Books is null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div>
+        <QuickGrid Items="Books" Pagination="pagination">
+            <PropertyColumn Property="@(book => book.Id)" Sortable="true" />
+            <PropertyColumn Property="@(book => book.Title)" Sortable="true" />
+            @if (ShowAllColumn)
+            {
+                <PropertyColumn Property="@(book => book.Price)" Sortable="true" />
+                <PropertyColumn Property="@(book => book.PublishDate)" Format="yyyy-MM-dd" Sortable="true" />
+                <PropertyColumn Property="@(book => book.InStock)" />
+                <PropertyColumn Property="@(book => book.Description)" />
+            }
+            <TemplateColumn Context="Book">
+                <BtnPrimary Href="@($"bookdetails?id={Book.Id}")" BtnName="Details"></BtnPrimary>
+                <BtnPrimary Href="@($"bookedit/{Book.Id}")" BtnName="Edit"></BtnPrimary>
+                <BtnDanger Href="@($"bookdelete/{Book.Id}")"></BtnDanger>
+            </TemplateColumn>
+        </QuickGrid>
+        <Paginator State="pagination" />
+    </div>
+
+}
+
+
+
+@code {
+    private string PageTitle = "Books List Grid";
+    public bool ShowAllColumn { get; set; } = true;
+
+    public IQueryable<Book> Books { get; set; } = null!;
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+
+    [Inject]
+    public MyServices.IBookService bookService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        Books = await bookService.GetAllBooksGrid();
+    }
+
+    private async Task Query()
+    {
+        Books = null!;
+        await Task.Delay(5000);
+        Books = await bookService.GetAllBooksGrid();
+    }
+}

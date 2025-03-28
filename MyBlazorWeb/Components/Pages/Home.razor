@@ -1,0 +1,25 @@
+﻿@page "/"
+@inject IConfiguration Configuration
+
+<PageTitle>@PageTitle</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="My sweet home page!" />
+    <meta name="author" content="steven" />
+</HeadContent>
+
+<div class="text-center">
+    <div class="p-2 mb-2 mt-2 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">@Configuration["WebsiteConfig:Welcome"]</h1>
+            <p> @Configuration["WebsiteConfig:Subtitle"] </p>
+            <img class="img-fluid w-25" src="images/cat_bat.png">
+        </div>
+    </div>
+</div>
+
+<ServerTime ShowDate="@DateTime.Now" DateTimeFormat="MM-dd-yyyy" ></ServerTime>
+
+@code {
+    private string PageTitle = "Home";
+}
