@@ -27,7 +27,7 @@ else
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
-    app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 //app.Use(async(context, next) =>
 //{

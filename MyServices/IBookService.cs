@@ -1,4 +1,5 @@
 ﻿using MyModels;
+using MyModels.Books;
 
 namespace MyServices
 {
@@ -10,5 +11,6 @@ namespace MyServices
         Task<Book> CreateBook(Book book);
         Task DeleteBook(int id);
         Task<IQueryable<Book>> GetAllBooksGrid();
+        Task<GetBooksResponse> GetBooksPages(GetBooksRequest request);
     }
 }

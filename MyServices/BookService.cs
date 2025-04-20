@@ -1,4 +1,5 @@
 ﻿using MyModels;
+using MyModels.Books;
 using System.Net.Http.Json;
 
 namespace MyServices
@@ -41,7 +42,7 @@ namespace MyServices
             var createdBook = await response.Content.ReadFromJsonAsync<Book>();
             if (createdBook is null)
             {
-                throw new InvalidOperationException("Insert failed!"); 
+                throw new InvalidOperationException("Insert failed!");
             }
             return createdBook;
         }
@@ -50,6 +51,19 @@ namespace MyServices
         {
             var response = await client.DeleteAsync($"api/books/{id}");
             response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<GetBooksResponse> GetBooksPages(GetBooksRequest request)
+        {
+            try
+            {
+                return await client.GetFromJsonAsync<GetBooksResponse>($"api/Books/paged?{request.ToQueryString()}") ?? new(request.PageNumber, request.PageSize, 0,[]);
+
+            }
+            catch (Exception)
+            {
+                return default!;
+            }
         }
     }
 }

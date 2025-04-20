@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyModels;
+using MyModels.Books;
 using MyWebApi.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,18 +18,33 @@ namespace MyWebApi.Controllers
         public async Task<ActionResult> Get()
         {
             try
-            {   
-                ////=========分頁查詢=========
-                //int pageNumber = 4;
-                //int pageSize = 5;
-                //int skip = (pageNumber - 1) * pageSize;
+            {
+                return Ok(await context.Books.ToListAsync());
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error get books from database !");
+            }
 
+        }
+
+        [HttpGet("Paged")]
+        public async Task<ActionResult> Paged([FromQuery] GetBooksRequest request)
+        {
+            try
+            {
+                ////=========分頁查詢========= 
+                //int skip = (request.PageNumber - 1) * request.PageSize;
                 //// 查詢總筆數
                 //int totalCount = await context.Books.CountAsync();
-                //Console.WriteLine($"totalCount: {totalCount}");
-                //var data = await context.Books.Skip(skip).Take(pageSize).ToListAsync();
+                //var dataList = await context.Books.Skip(skip).Take(request.PageSize).ToListAsync();
+
+                //return Ok(new GetBooksResponse(request.PageNumber, request.PageSize, totalCount, dataList));
                 ////=========分頁查詢=========
-                return Ok(await context.Books.ToListAsync());
+                //=========分頁查詢=========            
+                return Ok(await context.Books.ToPagedResultAsync(request, request.Search()));
+                //=========分頁查詢=========
             }
             catch (Exception)
             {
@@ -69,9 +86,9 @@ namespace MyWebApi.Controllers
                     return BadRequest();
                 }
 
-               await context.Books.AddAsync(book);
-               await context.SaveChangesAsync();
-               return CreatedAtAction(nameof(Post), new { id = book.Id }, book);
+                await context.Books.AddAsync(book);
+                await context.SaveChangesAsync();
+                return CreatedAtAction(nameof(Post), new { id = book.Id }, book);
             }
             catch (Exception)
             {
@@ -99,7 +116,7 @@ namespace MyWebApi.Controllers
                 }
 
                 context.Entry(b).CurrentValues.SetValues(book);
-                await context.SaveChangesAsync();   
+                await context.SaveChangesAsync();
                 return Ok(b);
 
             }
@@ -122,7 +139,7 @@ namespace MyWebApi.Controllers
                     return NotFound($"Book id {id} is not found.");
                 }
 
-                context.Books.Remove(b);    
+                context.Books.Remove(b);
                 await context.SaveChangesAsync();
                 return Ok(b);
 
