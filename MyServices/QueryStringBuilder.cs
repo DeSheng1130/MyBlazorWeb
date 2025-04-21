@@ -1,5 +1,4 @@
-﻿
-using MyModels.DTO.Paged;
+﻿using MyModels.DTO.Paged;
 using System.Reflection;
 
 namespace MyServices
@@ -8,10 +7,18 @@ namespace MyServices
     {
         public static string ToQueryString(this object obj)
         {
-            var properties = from p in obj.GetType().GetProperties()
-                             where p.GetValue(obj) != null
-                             from value in ToQueryParam(p, p.GetValue(obj)!)
-                             select $"{Uri.EscapeDataString(value.Key)}={Uri.EscapeDataString(value.Value)}";
+            // // LINQ query expression
+            //var properties = from p in obj.GetType().GetProperties()
+            //                 where p.GetValue(obj) != null
+            //                 from value in ToQueryParam(p, p.GetValue(obj)!)
+            //                 select $"{Uri.EscapeDataString(value.Key)}={Uri.EscapeDataString(value.Value)}";
+
+            // LINQ Method Syntax
+            var properties = obj.GetType().GetProperties()
+                .Where(p => p.GetValue(obj) is not null)
+                .SelectMany(p => ToQueryParam(p, p.GetValue(obj)!))
+                .Select(value => $"{Uri.EscapeDataString(value.Key)}={Uri.EscapeDataString(value.Value)}");
+
 
             return string.Join("&", properties);
         }
